@@ -9,7 +9,8 @@ public sealed record RefreshSessionCommand(string RefreshToken) : ICommand<AuthR
 
 /// <summary>
 /// Exchanges a valid refresh token for a new access token AND a new refresh token ("rotation").
-/// The old refresh token is revoked, so each refresh token works only once.
+/// The old refresh token stops working shortly after (see RefreshToken.RotationGracePeriod),
+/// so a stolen, already-used token is soon worthless.
 /// </summary>
 public sealed class RefreshSessionHandler(
     IAppDbContext db,
@@ -33,7 +34,7 @@ public sealed class RefreshSessionHandler(
         if (storedToken is null || !storedToken.IsActive(now))
             return AuthErrors.InvalidRefreshToken;
 
-        storedToken.Revoke(now);
+        storedToken.MarkReplaced(now);
         var session = sessionIssuer.Issue(storedToken.User);
         await db.SaveChangesAsync(cancellationToken);
 

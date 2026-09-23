@@ -1,0 +1,8 @@
+# Store text files with LF line endings in the repository; Git converts them for your OS on checkout.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.gif binary
+*.webp binary
+*.ico binary
