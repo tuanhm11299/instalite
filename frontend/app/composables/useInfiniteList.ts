@@ -29,7 +29,7 @@ export function useInfiniteList<T>(fetchPage: (cursor: string | null) => Promise
       const page = await fetchPage(cursor)
       if (requestGeneration !== generation) return
 
-      items.value.push(...page.items)
+      items.value.push(...withoutDuplicates(page.items))
       cursor = page.nextCursor
       hasMore.value = page.nextCursor !== null
     }
@@ -39,6 +39,16 @@ export function useInfiniteList<T>(fetchPage: (cursor: string | null) => Promise
     finally {
       if (requestGeneration === generation) loading.value = false
     }
+  }
+
+  /**
+   * Lists sorted by popularity (explore) can shift between two page loads, so the same item may
+   * come back twice. Items with an `id` that is already in the list are skipped.
+   */
+  function withoutDuplicates(newItems: T[]): T[] {
+    const idOf = (item: T) => (item as { id?: unknown }).id
+    const existingIds = new Set<unknown>(items.value.map(idOf).filter(id => id !== undefined))
+    return newItems.filter(item => idOf(item) === undefined || !existingIds.has(idOf(item)))
   }
 
   /** Empties the list and loads the first page again. */

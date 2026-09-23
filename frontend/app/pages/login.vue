@@ -24,9 +24,7 @@ async function onSubmit(event: FormSubmitEvent<LoginForm>) {
   errorMessage.value = ''
   try {
     await auth.login(event.data.login, event.data.password)
-    // Go back to the page the user originally wanted (only same-site paths, never full URLs).
-    const redirect = typeof route.query.redirect === 'string' && route.query.redirect.startsWith('/') ? route.query.redirect : '/'
-    await navigateTo(redirect)
+    await navigateTo(safeRedirectPath(route.query.redirect))
   }
   catch (error) {
     errorMessage.value = getErrorMessage(error)
@@ -34,6 +32,16 @@ async function onSubmit(event: FormSubmitEvent<LoginForm>) {
   finally {
     submitting.value = false
   }
+}
+
+/**
+ * Go back to the page the user originally wanted, but only to a path on this site.
+ * "//evil.com" also starts with "/", so it is rejected explicitly (it would leave the site).
+ */
+function safeRedirectPath(redirect: unknown): string {
+  if (typeof redirect !== 'string') return '/'
+  const isLocalPath = redirect.startsWith('/') && !redirect.startsWith('//') && !redirect.startsWith('/\\')
+  return isLocalPath ? redirect : '/'
 }
 
 function useDemoAccount() {

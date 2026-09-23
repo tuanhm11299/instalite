@@ -29,8 +29,9 @@ flowchart LR
     Api --> Disk[["uploads/ folder"]]
 ```
 
-The browser only talks to the Nuxt server. Nuxt forwards `/api/**` and `/uploads/**` to the .NET API (see `routeRules` in
-`frontend/nuxt.config.ts`). Because everything comes from one origin, CORS is not involved and the http-only refresh cookie works.
+The browser only talks to the Nuxt server. Nuxt forwards `/api/**` and `/uploads/**` to the .NET API
+(`frontend/server/routes/` → `server/utils/proxyToApi.ts`) and adds the visitor's real IP address, which the API uses for rate limiting.
+Because everything comes from one origin, CORS is not involved and the http-only refresh cookie works.
 
 ---
 
@@ -205,6 +206,7 @@ The app is a single-page app (`ssr: false`) built with Nuxt. Nuxt conventions to
 | `app/stores/` | Pinia stores: `auth` (who is signed in), `notifications` (badge) | Imported explicitly |
 | `app/api/` | Typed functions per backend area: `postsApi.like(id)` | Imported explicitly |
 | `app/middleware/auth.global.ts` | Runs before every page: sends signed-out visitors to `/login` | Pages opt out with `definePageMeta({ public: true })` |
+| `server/` | Code that runs on the Nuxt **server**, not in the browser: the proxy to the .NET API | |
 
 UI components come from [Nuxt UI](https://ui.nuxt.com) (`UButton`, `UModal`, `UCarousel`, `UForm`...). Colors are set in
 `app/app.config.ts` and use theme tokens such as `text-muted` and `bg-elevated`, which adapt to light and dark mode automatically.

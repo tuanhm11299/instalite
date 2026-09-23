@@ -1,10 +1,8 @@
 // Nuxt configuration. Docs: https://nuxt.com/docs/api/nuxt-config
 //
 // The browser only ever talks to this Nuxt server. Requests to /api/** and /uploads/**
-// are forwarded ("proxied") to the .NET API, so frontend and API share one origin:
-// no CORS setup is needed and the http-only refresh-token cookie just works.
-const apiUrl = process.env.NUXT_API_URL ?? 'http://localhost:5080'
-
+// are forwarded ("proxied") to the .NET API by server/routes/, so frontend and API share one
+// origin: no CORS setup is needed and the http-only refresh-token cookie just works.
 export default defineNuxtConfig({
   compatibilityDate: '2026-09-01',
 
@@ -21,6 +19,11 @@ export default defineNuxtConfig({
 
   devtools: { enabled: true },
 
+  runtimeConfig: {
+    // Address of the .NET API. Override when starting the server with the NUXT_API_URL environment variable.
+    apiUrl: 'http://localhost:5080',
+  },
+
   app: {
     head: {
       title: 'InstaLite',
@@ -34,11 +37,6 @@ export default defineNuxtConfig({
     },
   },
 
-  routeRules: {
-    '/api/**': { proxy: `${apiUrl}/api/**` },
-    '/uploads/**': { proxy: `${apiUrl}/uploads/**` },
-  },
-
   vite: {
     // Pre-bundle dependencies that are only imported by some pages, so the dev server
     // doesn't have to reload the browser the first time such a page is opened.
@@ -46,7 +44,7 @@ export default defineNuxtConfig({
   },
 
   icon: {
-    // Nuxt Icon serves icons from /api/_nuxt_icon by default, which would be caught by the /api proxy above.
+    // Nuxt Icon serves icons from /api/_nuxt_icon by default, which would be caught by our /api proxy.
     localApiEndpoint: '/_nuxt_icon',
     // Bundle the icons we use into the app so they never have to be downloaded separately.
     clientBundle: { scan: true },

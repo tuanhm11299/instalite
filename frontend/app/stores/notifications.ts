@@ -17,6 +17,8 @@ export const useNotificationsStore = defineStore('notifications', () => {
   async function markAllRead() {
     unreadCount.value = 0
     await notificationsApi.markAllRead()
+    // A badge refresh that started before the call above may have brought back the old number.
+    unreadCount.value = 0
   }
 
   return { unreadCount, refreshUnreadCount, markAllRead }

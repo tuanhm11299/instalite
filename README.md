@@ -65,16 +65,17 @@ instalite/
 │   │   └── InstaLite.Api/             HTTP endpoints, error handling, Program.cs
 │   └── tests/InstaLite.Tests/         Domain unit tests + API tests against real PostgreSQL
 └── frontend/
-    └── app/
-        ├── api/            One file per backend area: typed functions that call the API
-        ├── pages/          One file per screen (file name = URL)
-        ├── components/     UI pieces, grouped by area (posts, stories, users, layout, common)
-        ├── composables/    Reusable logic (infinite lists, post actions, dialogs...)
-        ├── stores/         Global state (who is logged in, unread notifications)
-        ├── layouts/        Page frames (signed-in app vs. login screens)
-        ├── middleware/     Redirects signed-out visitors to /login
-        ├── types/api.ts    TypeScript shapes of the API's JSON
-        └── utils/          Small helpers (formatting, error messages, image checks)
+    ├── app/
+    │   ├── api/            One file per backend area: typed functions that call the API
+    │   ├── pages/          One file per screen (file name = URL)
+    │   ├── components/     UI pieces, grouped by area (posts, stories, users, layout, common)
+    │   ├── composables/    Reusable logic (infinite lists, post actions, dialogs...)
+    │   ├── stores/         Global state (who is logged in, unread notifications)
+    │   ├── layouts/        Page frames (signed-in app vs. login screens)
+    │   ├── middleware/     Redirects signed-out visitors to /login
+    │   ├── types/api.ts    TypeScript shapes of the API's JSON
+    │   └── utils/          Small helpers (formatting, error messages, image checks)
+    └── server/             Runs on the Nuxt server: forwards /api and /uploads to the .NET API
 ```
 
 ## Running the tests
@@ -113,9 +114,11 @@ See `frontend/.env.example`.
 
 ## Production notes
 
-- Build the web app with `npm run build` and run it with `node .output/server/index.mjs`.
-  It serves the app and forwards `/api` and `/uploads` to the API, so the browser sees one website.
-  `NUXT_API_URL` is read at **build time**, so set it before `npm run build`.
+- Build the web app with `npm run build` and run it with `NUXT_API_URL=http://your-api:5080 node .output/server/index.mjs`.
+  It serves the app and forwards `/api` and `/uploads` to the API (`frontend/server/routes/`), so the browser sees one website.
+- The API trusts `X-Forwarded-For` only from the same machine (ASP.NET Core default). If Nuxt and the API run on
+  different machines, add the Nuxt server to `ForwardedHeadersOptions.KnownProxies` in `ApiServices.cs`, otherwise
+  all visitors share one login rate limit.
 - Set a strong `Jwt:SigningKey` and serve everything over HTTPS (the refresh cookie is then marked `Secure`).
 - Uploaded images are stored on the API server's disk. For several servers, implement `IFileStorage`
   for a cloud bucket (see `LocalFileStorage.cs`).
