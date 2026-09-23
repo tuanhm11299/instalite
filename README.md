@@ -10,7 +10,8 @@ It works on desktop and phone browsers.
 | Tests    | xUnit · Testcontainers (real PostgreSQL in Docker) |
 
 The backend combines **Clean Architecture** (layers) with **Vertical Slices + CQRS** (one file per use case).
-Read [docs/architecture.md](docs/architecture.md) for the full tour and step-by-step recipes for adding features.
+Read [docs/architecture.md](docs/architecture.md) for the full tour and step-by-step recipes for adding features,
+and [docs/roadmap.md](docs/roadmap.md) for what to build next.
 
 ## Features
 
@@ -57,6 +58,7 @@ To start again from an empty database: `docker compose down -v`, then `docker co
 instalite/
 ├── docker-compose.yml          PostgreSQL for local development
 ├── docs/architecture.md        How the code is organised + how to add features
+├── docs/roadmap.md             What to build next, phase by phase
 ├── backend/
 │   ├── src/
 │   │   ├── InstaLite.Domain/          Entities and business rules (no dependencies)
