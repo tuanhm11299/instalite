@@ -5,7 +5,8 @@ InstaLite is a lite Instagram clone built as a learning project: .NET 10 API + P
 Match the existing style: small files, plain names, comments that explain *why*, no clever abstractions.
 
 - Repo: https://github.com/tuanhm11299/instalite (default branch `main`)
-- Local path: `E:\MyPersonalProject\instalite` (Windows 10; use Git Bash or PowerShell; Docker Desktop required)
+- Local paths: `E:\MyPersonalProject\instalite` (Windows 10; use Git Bash or PowerShell) and
+  `/Users/tuan.huynh/MyProjects/instalite` (macOS, Apple silicon; zsh). Docker Desktop required on both.
 - Read first: `README.md` (run it), `docs/architecture.md` (how it's built + add-a-feature recipe), `docs/roadmap.md` (what's next)
 
 ## Run, test, check
@@ -45,6 +46,14 @@ Endpoints inject `ICommandHandler<TCommand, TResponse>` directly (`Api/Endpoints
 - A running API locks DLLs, so stop it before `dotnet test`, `dotnet build` or `dotnet ef`.
 - EF Core Relational is pinned to 10.0.12 in Infrastructure to avoid a version conflict with Npgsql's dependency.
 - Uploaded images are currently saved as-is (EXIF/GPS **not** stripped): roadmap Phase 0 fixes this.
+- **macOS differences** (nothing here is committed except this note; Windows is unaffected): the .NET SDK sits in
+  `~/.dotnet`, exported as `DOTNET_ROOT` and added to `PATH` in `~/.zshrc`. Host port 5432 belongs to another
+  project's container, so an untracked `docker-compose.override.yml` publishes PostgreSQL on **5434**
+  (`ports: !override` - plain merging *adds* a port instead of replacing it). The API therefore needs its
+  connection string passed in; it is set in the VS Code launch config and tasks, and in the terminal:
+  `ConnectionStrings__Database='Host=localhost;Port=5434;Database=instalite;Username=instalite;Password=instalite' dotnet run --project src/InstaLite.Api`
+  (same for `dotnet ef`). In Rider, add that variable once to the `http` run configuration. Forget it and the API
+  talks to 5432 - the other project's database - and fails with `28P01 password authentication failed`.
 
 ## Working agreements
 

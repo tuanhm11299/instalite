@@ -29,3 +29,6 @@ dist/
 .DS_Store
 Thumbs.db
 *.log
+
+# Local-only Compose overrides (machine-specific ports etc.)
+docker-compose.override.yml
